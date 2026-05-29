@@ -79,9 +79,17 @@ export default function Home() {
   // Si pagan al contado (100%), no hay cuotas. Sino, se divide en 26
   const cuotaMensual = cuotaInicial === 100 ? 0 : montoFinanciar / 26;
 
+    // Saldo restante
+  const saldoRestante = precioTotalBase - ((cuotaInicial/100 * precioTotalBase) + montoFinanciar);
+
+  // Porcentaje restante
+  const porcentajeRestante = 100 - (Math.abs(porcentajeFinanciar + cuotaInicial));
+
   // Lógica de conversión Dólar / Boliviano
   const multiplicador = mostrarEnBs ? tipoCambio : 1;
   const simboloMoneda = mostrarEnBs ? "Bs" : "$";
+
+
 
   const formatearDinero = (monto: number) => {
     return (monto * multiplicador).toLocaleString("en-US", {
@@ -106,13 +114,16 @@ export default function Home() {
     - Dormitorios: ${numDormitorios}
     - Orientación: ${orientacion}
     - Precio Base: ${simboloMoneda} ${formatearDinero(precioTotalBase)}
+    - Precio Parqueo: ${simboloMoneda} ${formatearDinero(precioParqueo)}
     - Descuento Aplicado: - ${simboloMoneda} ${formatearDinero(montoDescuento)}
     - *Total Final:* ${simboloMoneda} ${formatearDinero(precioFinal)}
 
     *Plan de Financiamiento:*
     - Cuota Inicial: ${cuotaInicial}%
     - Monto a Financiar (${porcentajeFinanciar}%): ${simboloMoneda} ${formatearDinero(montoFinanciar)}
+    - Saldo Restante: ${simboloMoneda} ${formatearDinero(saldoRestante)}
     - *Plan 26 Cuotas Mensuales:* ${simboloMoneda} ${formatearDinero(cuotaMensual)}
+    
 
     ¡Quedo a tu disposición para cualquier consulta!`;
 
@@ -129,7 +140,7 @@ export default function Home() {
       return;
     }
 
-    // --- GUARDAR EN BASE DE DATOS SUPABASE (Requisito #9) ---
+
     // --- GUARDAR EN BASE DE DATOS SUPABASE (Requisito #9) ---
     try {
       // Capturamos los datos del usuario autenticado actualmente
@@ -233,6 +244,7 @@ export default function Home() {
     doc.setFont("Helvetica", "normal");
     doc.text(`Aporte Cuota Inicial (${cuotaInicial}%): ${simboloMoneda} ${formatearDinero(precioFinal * (cuotaInicial / 100))}`, 15, 189);
     doc.text(`Saldo Comercial a Financiar (${porcentajeFinanciar}%): ${simboloMoneda} ${formatearDinero(montoFinanciar)}`, 15, 196);
+    doc.text(`Saldo a contraentrega (${porcentajeRestante}%): ${simboloMoneda} ${formatearDinero(saldoRestante)}`, 15, 203);
 
     // Bloque Destacado de Cuotas
     doc.setFillColor(241, 245, 249);
